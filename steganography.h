@@ -4,6 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 typedef unsigned char byte;
-void encrypt(char *image_file, char *text_file, char *output_image_file);
-void decrypt(char *image_file);
+void encrypt(char *image_file, char *output_image_file, char *text_file);
+void decrypt(char *image_file, char *output_file);
 #endif //STEGANOGRAFIA_STEGANOGRAPHY_H

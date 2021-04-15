@@ -1,11 +1,21 @@
 #include "steganography.h"
 
-void encrypt(char *image_file, char *text_file, char *output_image_file){
-    FILE *image = fopen(image_file, "rb"),
-        *text = fopen(text_file, "rb");
-    if(image == NULL || text == NULL){
-        printf("One of the specified input files is not present");
+void encrypt(char *image_file, char *output_image_file, char *text_file){
+    FILE *image = fopen(image_file, "rb"), *text, *output;
+    if(image == NULL){
+        printf("The image input file is not present");
         return;
+    }
+    if(text_file==NULL){
+        text=stdin;
+    }else{
+        text = fopen(text_file, "rb");
+    }
+    if(output_image_file==NULL){
+        output = fopen("output.bmp", "wb");
+    }else{
+        strcat(output_image_file, ".bmp");
+        output = fopen(output_image_file, "wb");
     }
     int i;
     long int image_length, text_length;
@@ -24,8 +34,6 @@ void encrypt(char *image_file, char *text_file, char *output_image_file){
         perror("Text too long for the image to be hidden");
         return;
     }
-    strcat(output_image_file, ".bmp");
-    FILE *output = fopen(output_image_file, "wb");
 
     fseek(text, 0, SEEK_SET);
     fseek(image, 0, SEEK_SET);
@@ -59,9 +67,12 @@ void encrypt(char *image_file, char *text_file, char *output_image_file){
             fwrite(&img, 1, sizeof(byte), output);
         }
     }
+    fclose(image);
+    fclose(text);
+    fclose(output);
 }
 
-void decrypt(char *image_file){
+void decrypt(char *image_file, char *output_file){
     FILE *encrypted = fopen(image_file, "rb");
     int i;
 
@@ -75,6 +86,12 @@ void decrypt(char *image_file){
     //i used to move inside the bits of the byte
     byte output;
     i=0;
+    FILE *out;
+    if(output_file==NULL){
+        out = stdout;
+    }else{
+        out = fopen(output_file, "w");
+    }
     while(!feof(encrypted)) {
         byte b;
         output = 0x00;
@@ -86,9 +103,13 @@ void decrypt(char *image_file){
             }
         }
         fread(&b, 1, sizeof(byte), encrypted);
-        printf("%c", output);
+        fprintf(out, "%c", output);
         if(output==0){
             break;
         }
+    }
+    fclose(encrypted);
+    if(output_file != NULL){
+        fclose(out);
     }
 }
